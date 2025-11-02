@@ -42,6 +42,7 @@ jobs:
 
   publish:
     name: Publish Artifacts
+    needs: [build]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
@@ -88,3 +89,14 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Deploy to Northflank
+        env:
+          NORTHFLANK_API_KEY: ${{ secrets.NORTHFLANK_API_KEY }}
+        run: |
+          curl \
+            --header "Content-Type: application/json" \
+            --header "Authorization: Bearer $NORTHFLANK_API_KEY" \
+            --request POST \
+            --data '{"external":{"imagePath":"ghcr.io/milessabin/helloweb-rust:latest","credentials":"github"},"docker":{"configType":"default"}}' \
+            https://api.northflank.com/v1/projects/helloweb/services/helloweb-rust/deployment
