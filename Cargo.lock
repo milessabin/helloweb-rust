@@ -200,7 +200,7 @@ dependencies = [
 
 [[package]]
 name = "helloweb"
-version = "0.0.3"
+version = "0.0.0"
 dependencies = [
  "axum",
  "built",
